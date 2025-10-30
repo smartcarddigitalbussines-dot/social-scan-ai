@@ -134,6 +134,30 @@ export const LeadsTable = () => {
     a.click();
   };
 
+  const exportToVCF = () => {
+    const vcfData = filteredLeads.map(lead => {
+      const vcard = [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
+        `FN:${lead.name}`,
+        `TEL:${lead.phone}`,
+      ];
+      
+      if (lead.email) vcard.push(`EMAIL:${lead.email}`);
+      if (lead.company) vcard.push(`ORG:${lead.company}`);
+      
+      vcard.push("END:VCARD");
+      return vcard.join("\n");
+    }).join("\n\n");
+
+    const blob = new Blob([vcfData], { type: "text/vcard" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `leads_${new Date().toISOString().split("T")[0]}.vcf`;
+    a.click();
+  };
+
   if (isLoading) {
     return <div className="text-center p-8">Carregando leads...</div>;
   }
@@ -150,10 +174,16 @@ export const LeadsTable = () => {
             className="pl-10"
           />
         </div>
-        <Button onClick={exportToCSV} variant="outline">
-          <Download className="mr-2 h-4 w-4" />
-          Exportar CSV
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={exportToCSV} variant="outline">
+            <Download className="mr-2 h-4 w-4" />
+            CSV
+          </Button>
+          <Button onClick={exportToVCF} variant="outline">
+            <Download className="mr-2 h-4 w-4" />
+            VCF
+          </Button>
+        </div>
       </div>
 
       {filteredLeads.length === 0 ? (
