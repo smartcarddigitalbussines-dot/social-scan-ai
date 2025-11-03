@@ -1,1 +1,13 @@
 project_id = "lagjaizghcpnzgbhrwqt"
+
+[functions.classify-lead]
+verify_jwt = false
+
+[functions.generate-message]
+verify_jwt = false
+
+[functions.lead-assistant]
+verify_jwt = false
+
+[functions.suggest-followup]
+verify_jwt = false

@@ -3,7 +3,11 @@ import { Dashboard } from "@/components/Dashboard";
 import { LeadImport } from "@/components/LeadImport";
 import { LeadsTable } from "@/components/LeadsTable";
 import { MessageTemplates } from "@/components/MessageTemplates";
-import { LayoutDashboard, Users, MessageSquare, Upload } from "lucide-react";
+import { BulkMessaging } from "@/components/BulkMessaging";
+import { AIClassifier } from "@/components/AIClassifier";
+import { MessageGenerator } from "@/components/MessageGenerator";
+import { LeadAssistant } from "@/components/LeadAssistant";
+import { FollowUpSuggestions } from "@/components/FollowUpSuggestions";
 
 const Index = () => {
   return (
@@ -14,61 +18,63 @@ const Index = () => {
             Sistema de Gestão de Leads
           </h1>
           <p className="text-muted-foreground text-lg">
-            Gerencie seus contatos e envie mensagens via WhatsApp
+            Gerencie seus contatos com inteligência artificial
           </p>
         </div>
 
-        <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto gap-2">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2 py-3">
-              <LayoutDashboard className="h-4 w-4" />
-              <span className="hidden sm:inline">Dashboard</span>
-            </TabsTrigger>
-            <TabsTrigger value="import" className="flex items-center gap-2 py-3">
-              <Upload className="h-4 w-4" />
-              <span className="hidden sm:inline">Importar</span>
-            </TabsTrigger>
-            <TabsTrigger value="leads" className="flex items-center gap-2 py-3">
-              <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Leads</span>
-            </TabsTrigger>
-            <TabsTrigger value="templates" className="flex items-center gap-2 py-3">
-              <MessageSquare className="h-4 w-4" />
-              <span className="hidden sm:inline">Templates</span>
-            </TabsTrigger>
+        <Tabs defaultValue="dashboard" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9 gap-1">
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="import">Importar</TabsTrigger>
+            <TabsTrigger value="leads">Leads</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="bulk">Envio Massa</TabsTrigger>
+            <TabsTrigger value="classifier">Classificar</TabsTrigger>
+            <TabsTrigger value="generator">Gerador</TabsTrigger>
+            <TabsTrigger value="assistant">Assistente</TabsTrigger>
+            <TabsTrigger value="followup">Follow-up</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="dashboard" className="space-y-6">
+          <TabsContent value="dashboard">
             <Dashboard />
           </TabsContent>
 
-          <TabsContent value="import" className="space-y-6">
+          <TabsContent value="import">
             <LeadImport />
-            <div className="bg-card p-6 rounded-lg border">
-              <h3 className="font-semibold mb-3">📋 Formato do CSV</h3>
+            <div className="mt-6 bg-card p-6 rounded-lg border">
+              <h3 className="font-semibold mb-3">📋 Formato do CSV/VCF</h3>
               <p className="text-sm text-muted-foreground mb-2">
-                Seu arquivo CSV deve conter as seguintes colunas:
+                Importe seus contatos em formato CSV ou VCF (vCard)
               </p>
-              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                <li><strong>Nome</strong> (obrigatório)</li>
-                <li><strong>Telefone</strong> (obrigatório) - com código do país</li>
-                <li>Email (opcional)</li>
-                <li>Empresa (opcional)</li>
-              </ul>
-              <div className="mt-4 p-3 bg-muted rounded text-xs font-mono">
-                Nome,Telefone,Email,Empresa<br />
-                João Silva,5511999887766,joao@email.com,Empresa ABC<br />
-                Maria Santos,5521988776655,maria@email.com,Empresa XYZ
-              </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="leads" className="space-y-6">
+          <TabsContent value="leads">
             <LeadsTable />
           </TabsContent>
 
-          <TabsContent value="templates" className="space-y-6">
+          <TabsContent value="templates">
             <MessageTemplates />
+          </TabsContent>
+
+          <TabsContent value="bulk">
+            <BulkMessaging />
+          </TabsContent>
+
+          <TabsContent value="classifier">
+            <AIClassifier />
+          </TabsContent>
+
+          <TabsContent value="generator">
+            <MessageGenerator />
+          </TabsContent>
+
+          <TabsContent value="assistant">
+            <LeadAssistant />
+          </TabsContent>
+
+          <TabsContent value="followup">
+            <FollowUpSuggestions />
           </TabsContent>
         </Tabs>
       </div>
