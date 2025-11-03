@@ -16,40 +16,88 @@ export type Database = {
     Tables: {
       leads: {
         Row: {
+          cep: string | null
+          cidade: string | null
           company: string | null
           created_at: string
+          data_nascimento: string | null
           email: string | null
+          endereco: string | null
+          estado: string | null
+          facebook: string | null
           id: string
+          instagram: string | null
+          linkedin: string | null
           name: string
           notes: string | null
           phone: string
+          placa_veiculo: string | null
+          preferencias: string | null
+          profissao: string | null
           status: string | null
           tags: string[] | null
+          tipo_veiculo: string | null
+          twitter: string | null
+          ultima_compra: string | null
           updated_at: string
+          valor_total_gasto: number | null
+          whatsapp: string | null
         }
         Insert: {
+          cep?: string | null
+          cidade?: string | null
           company?: string | null
           created_at?: string
+          data_nascimento?: string | null
           email?: string | null
+          endereco?: string | null
+          estado?: string | null
+          facebook?: string | null
           id?: string
+          instagram?: string | null
+          linkedin?: string | null
           name: string
           notes?: string | null
           phone: string
+          placa_veiculo?: string | null
+          preferencias?: string | null
+          profissao?: string | null
           status?: string | null
           tags?: string[] | null
+          tipo_veiculo?: string | null
+          twitter?: string | null
+          ultima_compra?: string | null
           updated_at?: string
+          valor_total_gasto?: number | null
+          whatsapp?: string | null
         }
         Update: {
+          cep?: string | null
+          cidade?: string | null
           company?: string | null
           created_at?: string
+          data_nascimento?: string | null
           email?: string | null
+          endereco?: string | null
+          estado?: string | null
+          facebook?: string | null
           id?: string
+          instagram?: string | null
+          linkedin?: string | null
           name?: string
           notes?: string | null
           phone?: string
+          placa_veiculo?: string | null
+          preferencias?: string | null
+          profissao?: string | null
           status?: string | null
           tags?: string[] | null
+          tipo_veiculo?: string | null
+          twitter?: string | null
+          ultima_compra?: string | null
           updated_at?: string
+          valor_total_gasto?: number | null
+          whatsapp?: string | null
         }
         Relationships: []
       }

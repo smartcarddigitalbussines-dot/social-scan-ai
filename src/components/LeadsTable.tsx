@@ -13,7 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Trash2, Search, MessageCircle, Download } from "lucide-react";
+import { Trash2, Search, MessageCircle, Download, Eye } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { LeadDetails } from "./LeadDetails";
 
 interface Lead {
   id: string;
@@ -31,6 +33,7 @@ export const LeadsTable = () => {
   const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -220,6 +223,14 @@ export const LeadsTable = () => {
                       <Button
                         size="sm"
                         variant="outline"
+                        onClick={() => setSelectedLeadId(lead.id)}
+                        title="Ver detalhes completos"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
                         onClick={() => sendWhatsApp(lead.phone, lead.name)}
                         className="text-secondary hover:bg-secondary hover:text-secondary-foreground"
                       >
@@ -240,6 +251,20 @@ export const LeadsTable = () => {
           </Table>
         </div>
       )}
+
+      <Dialog open={!!selectedLeadId} onOpenChange={(open) => !open && setSelectedLeadId(null)}>
+        <DialogContent className="max-w-6xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Perfil Completo do Lead</DialogTitle>
+          </DialogHeader>
+          {selectedLeadId && (
+            <LeadDetails 
+              leadId={selectedLeadId} 
+              onClose={() => setSelectedLeadId(null)} 
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

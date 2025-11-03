@@ -14,16 +14,34 @@ export const LeadImport = () => {
     const vcards = text.split("BEGIN:VCARD").filter(v => v.trim());
     return vcards.map(vcard => {
       const lines = vcard.split("\n");
-      let name = "", phone = "", email = "", company = "";
+      const lead: any = { tags: [], status: "active" };
       
       lines.forEach(line => {
-        if (line.startsWith("FN:")) name = line.substring(3).trim();
-        if (line.startsWith("TEL")) phone = line.split(":")[1]?.trim() || "";
-        if (line.startsWith("EMAIL")) email = line.split(":")[1]?.trim() || "";
-        if (line.startsWith("ORG:")) company = line.substring(4).trim();
+        if (line.startsWith("FN:")) lead.name = line.substring(3).trim();
+        else if (line.startsWith("TEL")) {
+          const tel = line.split(":")[1]?.trim();
+          if (!lead.phone) lead.phone = tel;
+          if (line.includes("WhatsApp") || line.includes("CELL")) lead.whatsapp = tel;
+        }
+        else if (line.startsWith("EMAIL")) lead.email = line.split(":")[1]?.trim();
+        else if (line.startsWith("ORG:")) lead.company = line.substring(4).trim();
+        else if (line.startsWith("ADR")) {
+          const parts = line.split(":")[1]?.split(";");
+          if (parts && parts.length > 0) lead.endereco = parts.join(", ").trim();
+        }
+        else if (line.startsWith("BDAY:")) lead.data_nascimento = line.substring(5).trim();
+        else if (line.startsWith("TITLE:")) lead.profissao = line.substring(6).trim();
+        else if (line.startsWith("NOTE:")) lead.notes = line.substring(5).trim();
+        else if (line.includes("X-SOCIALPROFILE") || line.includes("URL")) {
+          const url = line.split(":")[1]?.trim().toLowerCase();
+          if (url?.includes("facebook")) lead.facebook = url;
+          else if (url?.includes("instagram")) lead.instagram = url;
+          else if (url?.includes("linkedin")) lead.linkedin = url;
+          else if (url?.includes("twitter")) lead.twitter = url;
+        }
       });
       
-      return { name, phone, email: email || null, company: company || null, tags: [], status: "active" };
+      return lead;
     }).filter(lead => lead.name && lead.phone);
   };
 
