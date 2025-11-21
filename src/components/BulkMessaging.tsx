@@ -111,7 +111,6 @@ export const BulkMessaging = () => {
 
     let sentCount = 0;
     let errorCount = 0;
-    let currentTab: Window | null = null;
 
     for (let i = 0; i < selectedLeads.length; i++) {
       const leadId = selectedLeads[i];
@@ -133,23 +132,31 @@ export const BulkMessaging = () => {
           .replace(/{telefone}/g, lead.phone);
 
         const cleanPhone = lead.phone.replace(/\D/g, "");
-        
-        // Adicionar código do país se não existir
         const phoneWithCountry = cleanPhone.startsWith("55") ? cleanPhone : `55${cleanPhone}`;
         
-        // Fechar aba anterior se existir
-        if (currentTab && !currentTab.closed) {
-          currentTab.close();
-        }
+        console.log(`Enviando mensagem automaticamente para ${lead.name} (${phoneWithCountry})`);
         
-        // Abrir WhatsApp em uma nova aba (reutilizar a mesma aba)
-        currentTab = window.open(
-          `https://wa.me/${phoneWithCountry}?text=${encodeURIComponent(personalizedMessage)}`,
-          "_blank"
+        // Chamar Edge Function de automação do WhatsApp
+        const { data: automationResult, error: automationError } = await supabase.functions.invoke(
+          'whatsapp-automation',
+          {
+            body: {
+              phone: phoneWithCountry,
+              message: personalizedMessage,
+              leadName: lead.name
+            }
+          }
         );
 
-        // Aguardar 5 segundos para o usuário visualizar/enviar
-        await new Promise((resolve) => setTimeout(resolve, 5000));
+        if (automationError) {
+          throw new Error(automationError.message);
+        }
+
+        if (!automationResult?.success) {
+          throw new Error(automationResult?.error || 'Falha no envio automático');
+        }
+
+        console.log(`Mensagem enviada com sucesso:`, automationResult);
 
         // Salvar no histórico
         await supabase.from("message_history").insert({
@@ -167,12 +174,14 @@ export const BulkMessaging = () => {
       } catch (error) {
         console.error("Erro ao enviar mensagem:", error);
         
+        const errorMessage = error instanceof Error ? error.message : "Falha ao enviar";
+        
         // Atualizar status para "error"
         setSendStatuses(prev => prev.map(s => 
           s.leadId === leadId ? { 
             ...s, 
             status: "error" as SendStatus,
-            error: "Falha ao enviar"
+            error: errorMessage
           } : s
         ));
         
@@ -183,17 +192,12 @@ export const BulkMessaging = () => {
       const progress = ((i + 1) / selectedLeads.length) * 100;
       setSendProgress(progress);
 
-      // Delay variado entre envios (7-20 segundos)
+      // Delay variado entre envios (7-20 segundos) para evitar bloqueio pelo WhatsApp
       if (i < selectedLeads.length - 1) {
         const delay = getRandomDelay();
         console.log(`Aguardando ${delay / 1000} segundos antes do próximo envio...`);
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
-    }
-
-    // Fechar a última aba
-    if (currentTab && !currentTab.closed) {
-      currentTab.close();
     }
 
     setCurrentSending(null);
@@ -247,6 +251,23 @@ export const BulkMessaging = () => {
         <Badge variant="outline" className="text-xs">
           Gestão: {MANAGER_WHATSAPP}
         </Badge>
+      </div>
+
+      {/* Aviso de Automação */}
+      <div className="mb-4 p-4 border border-yellow-500/50 bg-yellow-500/10 rounded-lg">
+        <div className="flex gap-2">
+          <div className="text-yellow-600 dark:text-yellow-400 mt-0.5">⚠️</div>
+          <div className="flex-1 text-sm">
+            <p className="font-semibold mb-1">Automação em Modo Simulado</p>
+            <p className="text-muted-foreground">
+              Esta é uma simulação de envio automático. Para envios reais via WhatsApp Business API, 
+              configure o token WHATSAPP_BUSINESS_TOKEN nas configurações.
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              <strong>Importante:</strong> Automação do WhatsApp pode violar os Termos de Serviço e resultar em banimento da conta.
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-4">
