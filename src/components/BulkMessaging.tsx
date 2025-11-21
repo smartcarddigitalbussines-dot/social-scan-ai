@@ -74,6 +74,12 @@ export const BulkMessaging = () => {
     }
   };
 
+  // Função para gerar delay variado entre 7 e 20 segundos
+  const getRandomDelay = () => {
+    const delays = [7, 10, 12, 15, 18, 20]; // Segundos
+    return delays[Math.floor(Math.random() * delays.length)] * 1000; // Converter para ms
+  };
+
   const sendBulkMessages = async () => {
     if (selectedLeads.length === 0) {
       toast({
@@ -105,6 +111,7 @@ export const BulkMessaging = () => {
 
     let sentCount = 0;
     let errorCount = 0;
+    let currentTab: Window | null = null;
 
     for (let i = 0; i < selectedLeads.length; i++) {
       const leadId = selectedLeads[i];
@@ -130,11 +137,19 @@ export const BulkMessaging = () => {
         // Adicionar código do país se não existir
         const phoneWithCountry = cleanPhone.startsWith("55") ? cleanPhone : `55${cleanPhone}`;
         
-        // Abrir WhatsApp
-        window.open(
+        // Fechar aba anterior se existir
+        if (currentTab && !currentTab.closed) {
+          currentTab.close();
+        }
+        
+        // Abrir WhatsApp em uma nova aba (reutilizar a mesma aba)
+        currentTab = window.open(
           `https://wa.me/${phoneWithCountry}?text=${encodeURIComponent(personalizedMessage)}`,
           "_blank"
         );
+
+        // Aguardar 5 segundos para o usuário visualizar/enviar
+        await new Promise((resolve) => setTimeout(resolve, 5000));
 
         // Salvar no histórico
         await supabase.from("message_history").insert({
@@ -168,10 +183,17 @@ export const BulkMessaging = () => {
       const progress = ((i + 1) / selectedLeads.length) * 100;
       setSendProgress(progress);
 
-      // Delay entre envios (3 segundos para não parecer spam)
+      // Delay variado entre envios (7-20 segundos)
       if (i < selectedLeads.length - 1) {
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        const delay = getRandomDelay();
+        console.log(`Aguardando ${delay / 1000} segundos antes do próximo envio...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
+    }
+
+    // Fechar a última aba
+    if (currentTab && !currentTab.closed) {
+      currentTab.close();
     }
 
     setCurrentSending(null);
